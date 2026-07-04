@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SkinContext-Net v4.5 - Architecture Block Diagram</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    color: #e2e8f0;
+    padding: 20px;
+    min-height: 100vh;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(90deg, #0ea5e9, #a855f7, #ec4899);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(14,165,233,0.3);
+}
+.header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+.header p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.9);
+    margin-top: 6px;
+}
+.section-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #64748b;
+    text-align: center;
+    margin: 20px 0 12px;
+}
+
+/* Input Cards */
+.inputs-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.input-card {
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+.input-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #0ea5e9, #22c55e);
+}
+.input-card:hover {
+    border-color: #38bdf8;
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(56,189,248,0.2);
+}
+.input-icon {
+    font-size: 36px;
+    margin-bottom: 10px;
+    display: block;
+}
+.input-label {
+    font-size: 13px;
+    font-weight: 700;
+    color: #f1f5f9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+.input-dims {
+    font-size: 11px;
+    color: #0ea5e9;
+    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    margin-top: 6px;
+    background: rgba(14,165,233,0.1);
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 10px;
+}
+.input-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 8px;
+    line-height: 1.5;
+}
+
+/* Arrow */
+.arrow-container {
+    text-align: center;
+    margin: 12px 0;
+}
+.arrow {
+    display: inline-block;
+    width: 2px;
+    height: 30px;
+    background: linear-gradient(180deg, #475569, #0ea5e9);
+    position: relative;
+}
+.arrow::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 10px solid #0ea5e9;
+}
+
+/* Encoder Block */
+.encoder-block {
+    background: linear-gradient(135deg, #1e3a5f 0%, #0f172a 100%);
+    border: 2px solid #0ea5e9;
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(14,165,233,0.15);
+}
+.param-badge {
+    position: absolute;
+    top: -12px;
+    right: 20px;
+    background: #0f172a;
+    border: 2px solid #0ea5e9;
+    border-radius: 8px;
+    padding: 4px 14px;
+    font-size: 11px;
+    color: #0ea5e9;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+}
+.encoder-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #0ea5e9;
+    text-align: center;
+    margin-bottom: 16px;
+}
+.encoder-specs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin-bottom: 14px;
+}
+.spec-item {
+    background: rgba(14,165,233,0.08);
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid rgba(14,165,233,0.2);
+}
+.spec-label {
+    font-size: 9px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: block;
+    margin-bottom: 4px;
+}
+.spec-value {
+    font-size: 12px;
+    color: #7dd3fc;
+    font-weight: 600;
+}
+.stats-row {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(14,165,233,0.2);
+}
+.stat-item {
+    text-align: center;
+}
+.stat-value {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e2e8f0;
+    font-family: 'JetBrains Mono', monospace;
+}
+.stat-label {
+    font-size: 10px;
+    color: #64748b;
+    margin-top: 2px;
+}
+
+/* Splitter */
+.splitter {
+    display: flex;
+    align-items: center;
+    margin: 16px 0;
+    gap: 10px;
+}
+.splitter-line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, #475569, transparent);
+}
+.splitter-text {
+    font-size: 10px;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* Branch Container */
+.branch-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+.branch-block {
+    border-radius: 14px;
+    padding: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.branch-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+}
+.clinical-branch {
+    background: linear-gradient(135deg, #3f1e5f 0%, #1a0f2e 100%);
+    border: 2px solid #a855f7;
+    box-shadow: 0 8px 32px rgba(168,85,247,0.15);
+}
+.clinical-branch::before { background: linear-gradient(90deg, #a855f7, #c084fc); }
+.deviation-branch {
+    background: linear-gradient(135deg, #1e3f2a 0%, #0f1f17 100%);
+    border: 2px solid #22c55e;
+    box-shadow: 0 8px 32px rgba(34,197,94,0.15);
+}
+.deviation-branch::before { background: linear-gradient(90deg, #22c55e, #4ade80); }
+
+.branch-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 12px;
+}
+.clinical-title { color: #c084fc; }
+.deviation-title { color: #4ade80; }
+
+.branch-content {
+    font-size: 12px;
+    line-height: 1.7;
+    color: #cbd5e1;
+}
+.branch-content code {
+    background: rgba(255,255,255,0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: #fbbf24;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+}
+.branch-content b {
+    color: #e2e8f0;
+    display: block;
+    margin-top: 8px;
+    margin-bottom: 4px;
+}
+.output-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 10px;
+    margin-top: 8px;
+}
+.badge-purple { background: rgba(168,85,247,0.2); color: #c084fc; border: 1px solid rgba(168,85,247,0.4); }
+.badge-green { background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(34,197,94,0.4); }
+
+/* Fusion Block */
+.fusion-block {
+    background: linear-gradient(135deg, #2a1e3f 0%, #0f172a 100%);
+    border: 2px solid #f59e0b;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(245,158,11,0.15);
+    position: relative;
+}
+.fusion-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+.fusion-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #fbbf24;
+    margin-bottom: 10px;
+}
+.fusion-formula {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    color: #fde68a;
+    background: rgba(251,191,36,0.1);
+    padding: 10px 20px;
+    border-radius: 10px;
+    display: inline-block;
+    border: 1px solid rgba(251,191,36,0.3);
+}
+.fusion-desc {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 10px;
+}
+
+/* Classifier Block */
+.classifier-block {
+    background: linear-gradient(135deg, #1e1e3f 0%, #0f0f2a 100%);
+    border: 2px solid #ec4899;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(236,72,153,0.15);
+    position: relative;
+}
+.classifier-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ec4899, #f472b6);
+}
+.classifier-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #f472b6;
+    text-align: center;
+    margin-bottom: 14px;
+}
+.classifier-layers {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+.layer-box {
+    background: rgba(236,72,153,0.1);
+    border: 1px solid rgba(236,72,153,0.4);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 12px;
+    color: #fbcfe8;
+    font-family: 'JetBrains Mono', monospace;
+    text-align: center;
+    min-width: 60px;
+}
+.layer-box .layer-detail {
+    font-size: 9px;
+    color: #94a3b8;
+    display: block;
+    margin-top: 2px;
+}
+.layer-arrow {
+    color: #ec4899;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Uncertainty Block */
+.uncertainty-block {
+    background: linear-gradient(135deg, #1e2a3f 0%, #0f172a 100%);
+    border: 2px solid #06b6d4;
+    border-radius: 16px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(6,182,212,0.15);
+    position: relative;
+}
+.uncertainty-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #06b6d4, #22d3ee);
+}
+.uncertainty-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #22d3ee;
+    text-align: center;
+    margin-bottom: 10px;
+}
+.uncertainty-subtitle {
+    text-align: center;
+    font-size: 11px;
+    color: #94a3b8;
+    margin-bottom: 14px;
+}
+.uncertainty-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+}
+.uncertainty-tier {
+    background: rgba(6,182,212,0.08);
+    border-radius: 10px;
+    padding: 14px;
+    text-align: center;
+    border: 1px solid rgba(6,182,212,0.2);
+    transition: all 0.3s ease;
+}
+.uncertainty-tier:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(6,182,212,0.2);
+}
+.tier-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+}
+.tier-high { color: #4ade80; }
+.tier-medium { color: #fbbf24; }
+.tier-low { color: #f87171; }
+.tier-desc {
+    font-size: 10px;
+    color: #94a3b8;
+    line-height: 1.4;
+}
+.tier-thresh {
+    font-size: 10px;
+    color: #64748b;
+    margin-top: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(255,255,255,0.05);
+    padding: 2px 8px;
+    border-radius: 6px;
+    display: inline-block;
+}
+
+/* Output Block */
+.output-block {
+    background: linear-gradient(135deg, #0f2a1e 0%, #0f172a 100%);
+    border: 2px solid #22c55e;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(34,197,94,0.15);
+    position: relative;
+}
+.output-block::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #22c55e, #4ade80);
+}
+.output-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #4ade80;
+    margin-bottom: 10px;
+}
+.output-formula {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: #86efac;
+    margin: 4px 0;
+}
+.output-badges {
+    margin-top: 14px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.out-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 10px;
+}
+.out-green { background: rgba(34,197,94,0.2); color: #4ade80; border: 1px solid rgba(34,197,94,0.4); }
+.out-amber { background: rgba(245,158,11,0.2); color: #fbbf24; border: 1px solid rgba(245,158,11,0.4); }
+.out-pink { background: rgba(236,72,153,0.2); color: #f472b6; border: 1px solid rgba(236,72,153,0.4); }
+
+/* Footer */
+.footer {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #334155;
+    text-align: center;
+    font-size: 11px;
+    color: #64748b;
+    line-height: 1.6;
+}
+.footer b { color: #94a3b8; }
+.footer .footer-small {
+    font-size: 10px;
+    margin-top: 4px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .inputs-grid { grid-template-columns: 1fr; }
+    .branch-container { grid-template-columns: 1fr; }
+    .encoder-specs { grid-template-columns: repeat(2, 1fr); }
+    .uncertainty-grid { grid-template-columns: 1fr; }
+    .classifier-layers { flex-direction: column; }
+    .layer-arrow { transform: rotate(90deg); }
+}
+
+/* Print styles */
+@media print {
+    body { background: #fff; color: #000; }
+    .input-card, .encoder-block, .branch-block, .fusion-block, 
+    .classifier-block, .uncertainty-block, .output-block {
+        border: 2px solid #333 !important;
+        box-shadow: none !important;
+        background: #fff !important;
+        color: #000 !important;
+    }
+    .header { background: #333 !important; }
+}
+</style>
+<base target="_blank">
+</head>
+<body>
+<div class="container">
+
+    <div class="header">
+        <h1>SkinContext-Net v4.5</h1>
+        <p>Robust Patient-Lesion Deviation Pooling with Clinically-Calibrated Uncertainty</p>
+    </div>
+
+    <!-- INPUTS -->
+    <div class="section-label">Inputs</div>
+    <div class="inputs-grid">
+        <div class="input-card">
+            <span class="input-icon">&#128444;</span>
+            <div class="input-label">Target Image</div>
+            <div class="input-dims">384 x 384 x 3</div>
+            <div class="input-desc">ISIC 2024 TBP Clinical<br>3D total body photography</div>
+        </div>
+        <div class="input-card">
+            <span class="input-icon">&#128203;</span>
+            <div class="input-label">Clinical Metadata</div>
+            <div class="input-dims">40-dim vector</div>
+            <div class="input-desc">age, sex, anatomical site<br>tbp_lv_* (32 features)</div>
+        </div>
+        <div class="input-card">
+            <span class="input-icon">&#128100;</span>
+            <div class="input-label">Patient Context</div>
+            <div class="input-dims">N other images</div>
+            <div class="input-desc">Same patient's other lesions<br>Fallback: dataset prototype</div>
+        </div>
+    </div>
+
+    <!-- ARROW -->
+    <div class="arrow-container"><div class="arrow"></div></div>
+
+    <!-- ENCODER -->
+    <div class="encoder-block">
+        <div class="param-badge">5.3M params</div>
+        <div class="encoder-title">&#128309; EfficientNet-B0 Encoder (ImageNet-22K)</div>
+        <div class="encoder-specs">
+            <div class="spec-item">
+                <span class="spec-label">Architecture</span>
+                <span class="spec-value">MBConv + SE blocks</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">Compound Scaling</span>
+                <span class="spec-value">depth x width x resolution</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">Output</span>
+                <span class="spec-value">1280-d feature vector</span>
+            </div>
+            <div class="spec-item">
+                <span class="spec-label">Inference</span>
+                <span class="spec-value">~20ms on T4 GPU</span>
+            </div>
+        </div>
+        <div class="stats-row">
+            <div class="stat-item">
+                <div class="stat-value">1280</div>
+                <div class="stat-label">feature dim</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">~21MB</div>
+                <div class="stat-label">model size</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">97.15%</div>
+                <div class="stat-label">MDPI 2025 ref</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SPLITTER -->
+    <div class="splitter">
+        <div class="splitter-line"></div>
+        <div class="splitter-text">Parallel Branches</div>
+        <div class="splitter-line"></div>
+    </div>
+
+    <!-- BRANCHES -->
+    <div class="branch-container">
+        <div class="branch-block clinical-branch">
+            <div class="branch-title clinical-title">&#128302; Clinical Branch</div>
+            <div class="branch-content">
+                <code>sex</code> &rarr; emb(8)<br>
+                <code>site</code> &rarr; emb(16)<br>
+                <code>age</code> &rarr; linear(16)<br>
+                <code>tbp_lv_*</code> &rarr; linear(64)<br>
+                <br>
+                <b>MLP:</b> 104 &rarr; 64 &rarr; 32<br>
+                <span class="output-badge badge-purple">Output: 32-d</span>
+            </div>
+        </div>
+        <div class="branch-block deviation-branch">
+            <div class="branch-title deviation-title">&#9889; Deviation Pooling (Novel)</div>
+            <div class="branch-content">
+                <b>Attention over other images:</b><br>
+                <code>f_mean = &Sigma;(attn_i x f_i)</code><br><br>
+                <b>Compute deviation:</b><br>
+                <code>deviation = f_target - f_mean</code><br><br>
+                <b>Project:</b> <code>W_proj: 1280 &rarr; 256</code><br>
+                <span class="output-badge badge-green">Output: 256-d</span><br><br>
+                <b>Fallback:</b> if no others &rarr;<br>
+                use dataset prototype
+            </div>
+        </div>
+    </div>
+
+    <!-- ARROW -->
+    <div class="arrow-container"><div class="arrow"></div></div>
+
+    <!-- FUSION -->
+    <div class="fusion-block">
+        <div class="fusion-title">&#128279; Fusion Module</div>
+        <div class="fusion-formula">Concat[1280 &oplus; 256 &oplus; 32] = 1568-d</div>
+        <div class="fusion-desc">Image features + Deviation context + Clinical metadata</div>
+    </div>
+
+    <!-- ARROW -->
+    <div class="arrow-container"><div class="arrow"></div></div>
+
+    <!-- CLASSIFIER -->
+    <div class="classifier-block">
+        <div class="classifier-title">&#129504; Classifier Head</div>
+        <div class="classifier-layers">
+            <div class="layer-box">1568</div>
+            <div class="layer-arrow">&rarr;</div>
+            <div class="layer-box">
+                512
+                <span class="layer-detail">LN+GELU+DO(0.4)</span>
+            </div>
+            <div class="layer-arrow">&rarr;</div>
+            <div class="layer-box">
+                256
+                <span class="layer-detail">LN+GELU+DO(0.4)</span>
+            </div>
+            <div class="layer-arrow">&rarr;</div>
+            <div class="layer-box">
+                128
+                <span class="layer-detail">LN+GELU+DO(0.3)</span>
+            </div>
+            <div class="layer-arrow">&rarr;</div>
+            <div class="layer-box">
+                1
+                <span class="layer-detail">Sigmoid</span>
+            </div>
+        </div>
+        <div class="stats-row" style="margin-top:14px; border-top:1px solid rgba(236,72,153,0.2); padding-top:12px;">
+            <div class="stat-item">
+                <div class="stat-value">~6.5M</div>
+                <div class="stat-label">total params</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">~25MB</div>
+                <div class="stat-label">model size</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">&lt;50ms</div>
+                <div class="stat-label">inference</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ARROW -->
+    <div class="arrow-container"><div class="arrow"></div></div>
+
+    <!-- UNCERTAINTY -->
+    <div class="uncertainty-block">
+        <div class="uncertainty-title">&#127919; Uncertainty Quantification (Inference Only)</div>
+        <div class="uncertainty-subtitle">MC Dropout (T=10) x TTA (5 transforms) = 50 predictions</div>
+        <div class="uncertainty-grid">
+            <div class="uncertainty-tier">
+                <div class="tier-label tier-high">High Confidence</div>
+                <div class="tier-desc">Auto-approve for routine screening</div>
+                <div class="tier-thresh">&sigma;&sup2; &lt; 0.05</div>
+            </div>
+            <div class="uncertainty-tier">
+                <div class="tier-label tier-medium">Medium Confidence</div>
+                <div class="tier-desc">Flag for dermatologist review</div>
+                <div class="tier-thresh">0.05 &le; &sigma;&sup2; &lt; 0.15</div>
+            </div>
+            <div class="uncertainty-tier">
+                <div class="tier-label tier-low">Low Confidence</div>
+                <div class="tier-desc">Refer to specialist immediately</div>
+                <div class="tier-thresh">&sigma;&sup2; &ge; 0.15</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ARROW -->
+    <div class="arrow-container"><div class="arrow"></div></div>
+
+    <!-- OUTPUT -->
+    <div class="output-block">
+        <div class="output-title">&#128202; Final Output</div>
+        <div class="output-formula">&mu; = mean(predictions) &rarr; p(malignant)</div>
+        <div class="output-formula">&sigma;&sup2; = var(predictions) &rarr; uncertainty</div>
+        <div class="output-badges">
+            <span class="out-badge out-green">AUROC &gt; 0.90</span>
+            <span class="out-badge out-amber">ECE &lt; 0.05</span>
+            <span class="out-badge out-pink">Fairness Gap &lt; 10%</span>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <b>Key Innovations:</b> Differentiable Ugly Duckling Sign &bull; Clinically-Calibrated Uncertainty &bull; Fairness-Aware Evaluation<br>
+        <span class="footer-small">Target: Computers in Biology and Medicine (Q1, IF~7.0) &bull; 10 Weeks &bull; &lt;$50 Budget</span>
+    </div>
+
+</div>
+</body>
+</html>
