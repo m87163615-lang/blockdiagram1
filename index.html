@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SkinContext-Net v4.5 - Architecture Block Diagram</title>
+<title>SkinContext-Net v4.5-REVISED - Architecture Block Diagram</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
@@ -36,6 +36,16 @@ body {
     font-size: 14px;
     color: rgba(255,255,255,0.9);
     margin-top: 6px;
+}
+.header .version-badge {
+    display: inline-block;
+    margin-top: 8px;
+    background: rgba(255,255,255,0.2);
+    padding: 4px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
 }
 .section-label {
     font-size: 11px;
@@ -552,8 +562,9 @@ body {
 <div class="container">
 
     <div class="header">
-        <h1>SkinContext-Net v4.5</h1>
+        <h1>SkinContext-Net v4.5-REVISED</h1>
         <p>Robust Patient-Lesion Deviation Pooling with Clinically-Calibrated Uncertainty</p>
+        <div class="version-badge">Revised Plan - 16 Weeks - Realistic Targets</div>
     </div>
 
     <!-- INPUTS -->
@@ -574,7 +585,7 @@ body {
         <div class="input-card">
             <span class="input-icon">&#128100;</span>
             <div class="input-label">Patient Context</div>
-            <div class="input-dims">N other images</div>
+            <div class="input-dims">N other images (max 8)</div>
             <div class="input-desc">Same patient's other lesions<br>Fallback: dataset prototype</div>
         </div>
     </div>
@@ -650,8 +661,10 @@ body {
                 <code>deviation = f_target - f_mean</code><br><br>
                 <b>Project:</b> <code>W_proj: 1280 &rarr; 256</code><br>
                 <span class="output-badge badge-green">Output: 256-d</span><br><br>
-                <b>Fallback:</b> if no others &rarr;<br>
-                use dataset prototype
+                <b>Fallbacks:</b><br>
+                No others &rarr; dataset prototype<br>
+                &lt;3 others &rarr; simple mean<br>
+                <code>max_others = 8</code> (revised from 49)
             </div>
         </div>
     </div>
@@ -671,23 +684,23 @@ body {
 
     <!-- CLASSIFIER -->
     <div class="classifier-block">
-        <div class="classifier-title">&#129504; Classifier Head</div>
+        <div class="classifier-title">&#129504; Classifier Head (Revised Dropout)</div>
         <div class="classifier-layers">
             <div class="layer-box">1568</div>
             <div class="layer-arrow">&rarr;</div>
             <div class="layer-box">
                 512
-                <span class="layer-detail">LN+GELU+DO(0.4)</span>
+                <span class="layer-detail">LN+GELU+DO(0.3)</span>
             </div>
             <div class="layer-arrow">&rarr;</div>
             <div class="layer-box">
                 256
-                <span class="layer-detail">LN+GELU+DO(0.4)</span>
+                <span class="layer-detail">LN+GELU+DO(0.2)</span>
             </div>
             <div class="layer-arrow">&rarr;</div>
             <div class="layer-box">
                 128
-                <span class="layer-detail">LN+GELU+DO(0.3)</span>
+                <span class="layer-detail">LN+GELU+DO(0.15)</span>
             </div>
             <div class="layer-arrow">&rarr;</div>
             <div class="layer-box">
@@ -742,20 +755,20 @@ body {
 
     <!-- OUTPUT -->
     <div class="output-block">
-        <div class="output-title">&#128202; Final Output</div>
+        <div class="output-title">&#128202; Final Output (Revised Targets)</div>
         <div class="output-formula">&mu; = mean(predictions) &rarr; p(malignant)</div>
         <div class="output-formula">&sigma;&sup2; = var(predictions) &rarr; uncertainty</div>
         <div class="output-badges">
-            <span class="out-badge out-green">AUROC &gt; 0.90</span>
+            <span class="out-badge out-green">AUROC &gt; 0.88</span>
             <span class="out-badge out-amber">ECE &lt; 0.05</span>
-            <span class="out-badge out-pink">Fairness Gap &lt; 10%</span>
+            <span class="out-badge out-pink">Fairness Gap &lt; 15%</span>
         </div>
     </div>
 
     <!-- FOOTER -->
     <div class="footer">
         <b>Key Innovations:</b> Differentiable Ugly Duckling Sign &bull; Clinically-Calibrated Uncertainty &bull; Fairness-Aware Evaluation<br>
-        <span class="footer-small">Target: Computers in Biology and Medicine (Q1, IF~7.0) &bull; 10 Weeks &bull; &lt;$50 Budget</span>
+        <span class="footer-small">Target: JBHI (First) &rarr; Computers in Biology and Medicine &bull; 16 Weeks &bull; &lt;$50 Budget &bull; Rating: 8.5/10</span>
     </div>
 
 </div>
